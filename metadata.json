@@ -1,5 +1,5 @@
 {
-  "name": "ReviseApp",
+  "name": "StudySync",
   "description": "Study schedule manager with spaced repetition.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

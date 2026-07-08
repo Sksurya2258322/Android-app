@@ -11,8 +11,8 @@ class StudyRepository(private val studyDao: StudyDao) {
         return studyDao.getPendingRevisionsUpTo(date)
     }
 
-    suspend fun addLectureWithRevisions(subjectId: Int, title: String, dateMs: Long) {
-        val lecture = Lecture(subjectId = subjectId, title = title, completedAt = dateMs)
+    suspend fun addLectureWithRevisions(subjectId: Int, title: String, chapterName: String, dateMs: Long) {
+        val lecture = Lecture(subjectId = subjectId, title = title, chapterName = chapterName, completedAt = dateMs)
         val lectureId = studyDao.insertLecture(lecture).toInt()
         
         val firstIntervalDays = 1
@@ -66,5 +66,46 @@ class StudyRepository(private val studyDao: StudyDao) {
     
     suspend fun getLectureById(id: Int): Lecture? {
         return studyDao.getLectureById(id)
+    }
+    
+    suspend fun updateLecture(lecture: Lecture) {
+        studyDao.updateLecture(lecture)
+    }
+    
+    suspend fun deleteLecture(lectureId: Int) {
+        studyDao.deleteRevisionsForLecture(lectureId)
+        studyDao.deleteLecture(lectureId)
+    }
+
+    val allDpps: Flow<List<Dpp>> = studyDao.getAllDpps()
+    
+    val allCompletedCalendarEvents: Flow<List<CompletedCalendarEvent>> = studyDao.getAllCompletedCalendarEvents()
+
+    suspend fun addDpp(subjectId: Int, title: String, chapterName: String, dateMs: Long) {
+        val dpp = Dpp(subjectId = subjectId, title = title, chapterName = chapterName, completedAt = dateMs)
+        studyDao.insertDpp(dpp)
+    }
+    
+    suspend fun updateDpp(dpp: Dpp) {
+        studyDao.updateDpp(dpp)
+    }
+    
+    suspend fun deleteDpp(dppId: Int) {
+        studyDao.deleteDpp(dppId)
+    }
+    
+    suspend fun toggleCalendarEventCompletion(eventId: String, isCompleted: Boolean, dateMs: Long) {
+        if (isCompleted) {
+            studyDao.insertCompletedCalendarEvent(CompletedCalendarEvent(eventId, dateMs))
+        } else {
+            studyDao.deleteCompletedCalendarEvent(eventId)
+        }
+    }
+    
+    val allDailyReports: Flow<List<DailyReport>> = studyDao.getAllDailyReports()
+    
+    suspend fun saveDailyReport(dateMs: Long, completedTasks: Int, totalTasks: Int) {
+        val report = DailyReport(dateMs, completedTasks, totalTasks)
+        studyDao.insertDailyReport(report)
     }
 }

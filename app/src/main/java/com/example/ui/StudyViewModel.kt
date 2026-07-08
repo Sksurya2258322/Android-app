@@ -39,6 +39,15 @@ class StudyViewModel(application: Application) : AndroidViewModel(application) {
     val allRevisions: StateFlow<List<Revision>> = repository.allRevisions
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
         
+    val allDpps: StateFlow<List<com.example.data.Dpp>> = repository.allDpps
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+        
+    val completedCalendarEvents: StateFlow<List<com.example.data.CompletedCalendarEvent>> = repository.allCompletedCalendarEvents
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+        
+    val allDailyReports: StateFlow<List<com.example.data.DailyReport>> = repository.allDailyReports
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     private val _currentDate = MutableStateFlow(getEndOfDayMillis(System.currentTimeMillis()))
 
     val pendingRevisionsToday = repository.getPendingRevisionsUpTo(getEndOfDayMillis(System.currentTimeMillis()))
@@ -102,9 +111,9 @@ class StudyViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun submitLecture(subjectId: Int, title: String, dateMs: Long) {
+    fun submitLecture(subjectId: Int, title: String, chapterName: String, dateMs: Long) {
         viewModelScope.launch {
-            repository.addLectureWithRevisions(subjectId, title, dateMs)
+            repository.addLectureWithRevisions(subjectId, title, chapterName, dateMs)
         }
     }
 
@@ -116,6 +125,49 @@ class StudyViewModel(application: Application) : AndroidViewModel(application) {
     
     suspend fun getLecture(id: Int): Lecture? {
         return repository.getLectureById(id)
+    }
+
+    fun updateLecture(lecture: Lecture) {
+        viewModelScope.launch {
+            repository.updateLecture(lecture)
+        }
+    }
+
+    fun deleteLecture(lectureId: Int) {
+        viewModelScope.launch {
+            repository.deleteLecture(lectureId)
+        }
+    }
+    
+    fun submitDpp(subjectId: Int, title: String, chapterName: String, dateMs: Long) {
+        viewModelScope.launch {
+            repository.addDpp(subjectId, title, chapterName, dateMs)
+        }
+    }
+    
+    fun updateDpp(dpp: com.example.data.Dpp) {
+        viewModelScope.launch {
+            repository.updateDpp(dpp)
+        }
+    }
+    
+    fun deleteDpp(dppId: Int) {
+        viewModelScope.launch {
+            repository.deleteDpp(dppId)
+        }
+    }
+    
+    fun toggleCalendarEventCompletion(eventId: String, isCompleted: Boolean, dateMs: Long) {
+        viewModelScope.launch {
+            repository.toggleCalendarEventCompletion(eventId, isCompleted, dateMs)
+        }
+    }
+    
+    fun saveDailyReport(completedTasks: Int, totalTasks: Int) {
+        viewModelScope.launch {
+            val dateMs = getStartOfDayMillis(System.currentTimeMillis())
+            repository.saveDailyReport(dateMs, completedTasks, totalTasks)
+        }
     }
 
     private fun getStartOfDayMillis(timeMs: Long): Long {

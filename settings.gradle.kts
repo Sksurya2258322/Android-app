@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "ReviseApp"
+rootProject.name = "StudySync"
 
 include(":app")

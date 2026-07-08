@@ -27,6 +27,15 @@ interface StudyDao {
     @Update
     suspend fun updateRevision(revision: Revision)
     
+    @Update
+    suspend fun updateLecture(lecture: Lecture)
+    
+    @Query("DELETE FROM lectures WHERE id = :lectureId")
+    suspend fun deleteLecture(lectureId: Int)
+    
+    @Query("DELETE FROM revisions WHERE lectureId = :lectureId")
+    suspend fun deleteRevisionsForLecture(lectureId: Int)
+    
     @Query("SELECT * FROM lectures WHERE id = :lectureId")
     suspend fun getLectureById(lectureId: Int): Lecture?
     
@@ -35,4 +44,31 @@ interface StudyDao {
     
     @Query("SELECT * FROM revisions ORDER BY scheduledDate ASC")
     fun getAllRevisions(): Flow<List<Revision>>
+    
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDpp(dpp: Dpp)
+    
+    @Update
+    suspend fun updateDpp(dpp: Dpp)
+    
+    @Query("DELETE FROM dpps WHERE id = :dppId")
+    suspend fun deleteDpp(dppId: Int)
+    
+    @Query("SELECT * FROM dpps ORDER BY completedAt DESC")
+    fun getAllDpps(): Flow<List<Dpp>>
+    
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCompletedCalendarEvent(event: CompletedCalendarEvent)
+    
+    @Query("DELETE FROM completed_calendar_events WHERE eventId = :eventId")
+    suspend fun deleteCompletedCalendarEvent(eventId: String)
+    
+    @Query("SELECT * FROM completed_calendar_events")
+    fun getAllCompletedCalendarEvents(): Flow<List<CompletedCalendarEvent>>
+    
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDailyReport(report: DailyReport)
+    
+    @Query("SELECT * FROM daily_reports ORDER BY dateMs DESC")
+    fun getAllDailyReports(): Flow<List<DailyReport>>
 }
